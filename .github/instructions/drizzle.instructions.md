@@ -17,6 +17,7 @@ The app's data lives in a local SQLite database accessed through **Drizzle ORM**
 - `db/test-helpers.ts` — `createTestDatabase()` returns a migrated in-memory Node SQLite db for tests.
 - `src/lib/db.ts` — `createDatabase(url)` / `getDatabase()` build the Drizzle client from `DATABASE_URL` (defaults to the local `tailspin.db` file).
 - `src/lib/games.ts` — typed, **injectable-db** data-access helpers used by pages and tests.
+- `src/lib/publishers.ts` — `getAllPublishers(db)` returns publisher ids and names, ordered by name.
 
 ## Schema Conventions
 
@@ -53,7 +54,7 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 
 - Always `order by` a stable column (title) so static builds are deterministic.
 - Map raw rows to the app-facing `Game`/`Publisher`/`Category` types in one place; don't leak Drizzle row shapes into components.
-- Keep ordering/lookup logic in `games.ts`, not in pages.
+- Keep ordering/lookup logic in the relevant `src/lib/` helper module, not in pages.
 
 ## Determinism
 

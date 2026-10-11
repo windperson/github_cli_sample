@@ -46,6 +46,8 @@ npm run preview
 
 The SQLite database is built from `db/games.csv` — there is no live data to migrate.
 
+Build-time data-access helpers accept an injectable database client. `getAllPublishers(db)` in `src/lib/publishers.ts` returns every publisher as `{ id, name }`, ordered alphabetically by name, including publishers without games.
+
 ```bash
 npm run db:generate   # generate a migration after editing db/schema.ts
 npm run db:migrate    # apply migrations
