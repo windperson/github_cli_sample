@@ -51,6 +51,8 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Dynamic routes use `getStaticPaths()` + `export const prerender = true`
 - Provide a branded `404.astro` (unknown routes are real 404s under static output)
 - Only add a scoped Astro `<script>` when genuine client interactivity is required
+- Preserve the shared header's contrast toggle on all pages. `Layout.astro` restores the `tailspin-contrast` localStorage preference before paint; `ContrastToggle.astro` updates it with an accessible pressed state and reports storage failures.
+- High-contrast colors are Tailwind token overrides in `src/styles/global.css`. Use the `high-contrast:` variant for borders and verify new UI in both palettes with E2E accessibility scans.
 
 ### Styling
 

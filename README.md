@@ -42,6 +42,21 @@ npm run build      # prebuild migrates + seeds, then builds the static site
 npm run preview
 ```
 
+## Accessibility
+
+Every page includes a keyboard-accessible **High contrast** toggle in the header.
+It exposes its on/off state to assistive technology and switches to black
+backgrounds, white text and borders, and yellow accents. The default dark palette
+is unchanged until you opt in. Your selection is saved locally in your browser
+and restored before rendering on reload and navigation, including the 404 page.
+If browser storage is unavailable, the toggle still works for the current page
+and announces that the preference could not be saved.
+
+A skip link bypasses the header, interactive elements have visible keyboard
+focus indicators, and reduced-motion preferences disable transitions and smooth
+scrolling. Playwright tests cover both palettes with axe WCAG 2.1 AA scans,
+keyboard controls, preference persistence, and storage failures.
+
 ## Database
 
 The SQLite database is built from `db/games.csv` — there is no live data to migrate.

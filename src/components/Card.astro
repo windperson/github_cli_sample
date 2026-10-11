@@ -10,6 +10,6 @@ const { as = 'div', class: className, ...rest } = Astro.props;
 const Element = as;
 ---
 
-<Element class:list={['bg-slate-800/70 backdrop-blur-sm border border-slate-700 rounded-xl', className]} {...rest}>
+<Element class:list={['bg-slate-800/70 backdrop-blur-sm border border-slate-700 rounded-xl high-contrast:border-white', className]} {...rest}>
     <slot />
 </Element>

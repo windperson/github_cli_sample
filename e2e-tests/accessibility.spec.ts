@@ -2,37 +2,59 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test.describe('Accessibility Tests', () => {
-  test('home page should not have accessibility violations', async ({ page }) => {
+  for (const path of ['/', '/game/1', '/about', '/missing-page']) {
+    for (const contrast of ['normal', 'high']) {
+      test(`${path} has no WCAG AA violations in ${contrast} contrast, including open navigation`, async ({ page }) => {
+        await page.goto(path);
+        const toggle = page.getByRole('button', { name: 'High contrast', exact: true });
+        await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+        if (contrast === 'high') await toggle.click();
+
+        await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+        await expect(page.locator('html')).toHaveAttribute('data-contrast', contrast);
+        const scan = new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
+        expect((await scan.analyze()).violations).toEqual([]);
+        if (path === '/game/1') {
+          await page.getByRole('button', { name: 'Support This Game' }).hover();
+          expect((await scan.analyze()).violations).toEqual([]);
+        }
+
+        await page.getByRole('button', { name: 'Toggle menu' }).click();
+        await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
+        await page.getByRole('navigation').getByRole('link', { name: 'About' }).hover();
+        expect((await scan.analyze()).violations).toEqual([]);
+      });
+    }
+  }
+
+  test('skip link bypasses the header and Escape restores menu focus', async ({ page }) => {
     await page.goto('/');
-    await page.waitForSelector('[data-testid="games-grid"]', { timeout: 10000 });
-    
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze();
-    
-    expect(accessibilityScanResults.violations).toEqual([]);
+    await page.keyboard.press('Tab');
+    const skipLink = page.getByRole('link', { name: 'Skip to main content' });
+    await expect(skipLink).toBeFocused();
+    await expect(skipLink).toBeVisible();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('main')).toBeFocused();
+
+    const menuButton = page.getByRole('button', { name: 'Toggle menu' });
+    await menuButton.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('navigation').getByRole('link', { name: 'Home', exact: true })).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(menuButton).toBeFocused();
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.getByRole('navigation')).toBeHidden();
   });
 
-  test('game details page should not have accessibility violations', async ({ page }) => {
-    await page.goto('/game/1');
-    await page.waitForSelector('[data-testid="game-details"]', { timeout: 10000 });
-    
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze();
-    
-    expect(accessibilityScanResults.violations).toEqual([]);
-  });
-
-  test('about page should not have accessibility violations', async ({ page }) => {
-    await page.goto('/about');
-    await page.waitForSelector('[data-testid="about-section"]', { timeout: 10000 });
-    
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze();
-    
-    expect(accessibilityScanResults.violations).toEqual([]);
+  test('reduced motion disables card movement, transitions, and smooth scrolling', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    const card = page.getByTestId('game-card').first();
+    await card.hover();
+    await expect(card).toHaveCSS('transform', 'none');
+    await expect(card).toHaveCSS('transition-duration', '0s');
+    await expect(page.locator('html')).toHaveCSS('scroll-behavior', 'auto');
   });
 
   test('keyboard navigation - should be able to navigate header menu', async ({ page }) => {

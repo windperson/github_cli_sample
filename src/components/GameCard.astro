@@ -12,7 +12,7 @@ const { game } = Astro.props;
 
 <a
     href={`/game/${game.id}`}
-    class="group block bg-slate-800/60 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-slate-700/50 hover:border-blue-500/50 hover:shadow-blue-500/10 hover:shadow-xl transition-all duration-300 hover:translate-y-[-6px]"
+    class="group block bg-slate-800/60 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-slate-700/50 hover:border-blue-500/50 hover:shadow-blue-500/10 hover:shadow-xl transition-all duration-300 hover:translate-y-[-6px] high-contrast:border-white high-contrast:hover:border-blue-400"
     data-testid="game-card"
     data-game-id={game.id}
     data-game-title={game.title}

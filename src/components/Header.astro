@@ -1,23 +1,25 @@
 ---
 import Menu from '../assets/icons/menu.svg';
+import ContrastToggle from './ContrastToggle.astro';
 ---
 
 <header class="bg-blue-500 dark:bg-blue-700 text-white p-4 shadow-md transition-colors duration-300">
-  <div class="container mx-auto flex justify-between items-center pl-4 pr-4">
+  <div class="container mx-auto flex flex-wrap gap-3 justify-between items-center sm:px-4">
     <div class="flex items-center">
       <div class="relative group">
-        <button id="menu-toggle" class="focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-500 rounded mr-4" aria-label="Toggle menu" aria-expanded="false" aria-controls="menu">
+        <button id="menu-toggle" type="button" data-testid="menu-toggle" class="min-h-11 min-w-11 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-500 rounded mr-2" aria-label="Toggle menu" aria-expanded="false" aria-controls="menu">
           <Menu class="h-6 w-6" aria-hidden="true" />
         </button>
-        <nav id="menu" aria-label="Main" class="hidden absolute left-0 mt-2 w-48 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded shadow-lg z-10 transition-colors duration-300">
+        <nav id="menu" aria-label="Main" class="hidden absolute left-0 mt-2 w-48 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded shadow-lg z-10 transition-colors duration-300 high-contrast:border high-contrast:border-white high-contrast:bg-black high-contrast:text-white">
           <ul class="py-1">
-            <li><a href="/" class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700">Home</a></li>
-            <li><a href="/about" class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700">About</a></li>
+            <li><a href="/" data-testid="nav-home" class="block min-h-11 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 high-contrast:hover:bg-black">Home</a></li>
+            <li><a href="/about" data-testid="nav-about" class="block min-h-11 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 high-contrast:hover:bg-black">About</a></li>
           </ul>
         </nav>
       </div>
-      <div class="text-xl font-bold"><a href="/" class="hover:underline">Tailspin Toys</a></div>
+      <div class="text-xl font-bold"><a href="/" data-testid="nav-brand" class="inline-flex min-h-11 items-center hover:underline">Tailspin Toys</a></div>
     </div>
+    <ContrastToggle />
   </div>
 </header>
 

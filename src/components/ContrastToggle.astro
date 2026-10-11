@@ -1,0 +1,36 @@
+<div class="flex flex-col items-end">
+  <button
+    type="button"
+    data-testid="contrast-toggle"
+    aria-pressed="false"
+    hidden
+    class="min-h-11 rounded-lg border border-white bg-blue-700 px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-white focus:outline-none"
+  >
+    High contrast
+  </button>
+  <p data-testid="contrast-status" role="status" class="max-w-48 text-sm"></p>
+</div>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-testid="contrast-toggle"]');
+  const status = document.querySelector<HTMLElement>('[data-testid="contrast-status"]');
+
+  if (toggle && status) {
+    toggle.setAttribute('aria-pressed', String(document.documentElement.dataset.contrast === 'high'));
+    toggle.hidden = false;
+
+    toggle.addEventListener('click', () => {
+      const contrast = document.documentElement.dataset.contrast === 'high' ? 'normal' : 'high';
+      document.documentElement.dataset.contrast = contrast;
+      toggle.setAttribute('aria-pressed', String(contrast === 'high'));
+      status.textContent = '';
+
+      try {
+        localStorage.setItem('tailspin-contrast', contrast);
+      } catch (error) {
+        console.warn('Unable to save the contrast preference.', error);
+        status.textContent = 'Your contrast preference could not be saved. It applies to this page only.';
+      }
+    });
+  }
+</script>
