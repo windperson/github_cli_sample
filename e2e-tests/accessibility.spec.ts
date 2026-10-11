@@ -1,3 +1,6 @@
+/**
+ * Checks page accessibility and keyboard navigation across the static site.
+ */
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -80,7 +83,7 @@ test.describe('Accessibility Tests', () => {
     await page.waitForSelector('[data-testid="games-grid"]', { timeout: 10000 });
 
     await test.step('Tab through page until a game card receives focus', async () => {
-      const MAX_TABS = 50;
+      const MAX_TABS = await page.locator('a[href]:visible, button:enabled:visible, input:enabled:visible, select:enabled:visible').count();
       let tabCount = 0;
 
       await expect.poll(async () => {
@@ -103,7 +106,8 @@ test.describe('Accessibility Tests', () => {
       let tabCount = 0;
       let gameCardFocused = false;
 
-      while (tabCount < 20 && !gameCardFocused) {
+      const maxTabs = await page.locator('a[href]:visible, button:enabled:visible, input:enabled:visible, select:enabled:visible').count();
+      while (tabCount < maxTabs && !gameCardFocused) {
         await page.keyboard.press('Tab');
         tabCount++;
 

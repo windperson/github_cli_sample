@@ -1,4 +1,7 @@
-import { eq, asc } from 'drizzle-orm';
+/**
+ * Build-time data-access helpers for games and their related summaries.
+ */
+import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
@@ -50,19 +53,47 @@ function baseGamesQuery(db: Database) {
         .leftJoin(publishers, eq(games.publisherId, publishers.id));
 }
 
-/** All games ordered by title. */
-export async function getAllGames(db: Database): Promise<Game[]> {
-    const rows = await baseGamesQuery(db).orderBy(asc(games.title));
+/** Optional category and publisher constraints for a game listing. */
+export interface GameFilters {
+    categoryIds?: readonly number[];
+    publisherId?: number;
+}
+
+/**
+ * Retrieves games ordered by title, matching any selected category and the publisher.
+ *
+ * @param db - The database connection to query.
+ * @param filters - Optional constraints; empty categories mean all categories.
+ * @returns Matching games with their category and publisher summaries.
+ */
+export async function getAllGames(db: Database, filters: GameFilters = {}): Promise<Game[]> {
+    const rows = await baseGamesQuery(db)
+        .where(and(
+            filters.categoryIds?.length ? inArray(games.categoryId, filters.categoryIds) : undefined,
+            filters.publisherId !== undefined ? eq(games.publisherId, filters.publisherId) : undefined,
+        ))
+        .orderBy(asc(games.title));
     return rows.map(mapGame);
 }
 
-/** All game ids ordered by title. */
+/**
+ * Retrieves all game ids ordered by title.
+ *
+ * @param db - The database connection to query.
+ * @returns Game ids for generating static detail routes.
+ */
 export async function getAllGameIds(db: Database): Promise<number[]> {
     const rows = await db.select({ id: games.id }).from(games).orderBy(asc(games.title));
     return rows.map((row) => row.id);
 }
 
-/** A single game by id, or null when it does not exist. */
+/**
+ * Retrieves a single game with its related summaries.
+ *
+ * @param db - The database connection to query.
+ * @param id - The game id to look up.
+ * @returns The game, or null when it does not exist.
+ */
 export async function getGameById(db: Database, id: number): Promise<Game | null> {
     const row = await baseGamesQuery(db).where(eq(games.id, id)).get();
     return row ? mapGame(row) : null;
