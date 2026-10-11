@@ -48,6 +48,8 @@ The SQLite database is built from `db/games.csv` — there is no live data to mi
 
 Build-time data-access helpers accept an injectable database client. `getAllPublishers(db)` in `src/lib/publishers.ts` returns every publisher as `{ id, name }`, ordered alphabetically by name, including publishers without games.
 
+`getAllCategories(db)` in `src/lib/categories.ts` provides the same ordered summary shape for categories, including those without games. `getAllGames(db, { categoryIds: [1, 2], publisherId: 3 })` optionally narrows the title-ordered listing: any selected category can match, and the publisher constraint is combined with AND. Omitted constraints or an empty category array leave that dimension unrestricted; unknown IDs yield no matching games.
+
 ```bash
 npm run db:generate   # generate a migration after editing db/schema.ts
 npm run db:migrate    # apply migrations
@@ -58,6 +60,12 @@ npm run db:export     # write the seeded catalog to db/catalog.json
 
 > [!NOTE]
 > Seeding is idempotent — it skips games that already exist (matched by title) rather than reconciling changed rows. CI always starts from a clean database, so it reflects `games.csv` exactly. Locally, if you edit or remove rows in `games.csv`, delete `tailspin.db` and re-run `npm run db:setup` to fully regenerate.
+
+## Filtering games
+
+On the homepage, select one or more category checkboxes and optionally a publisher. Games matching **any** selected category and the selected publisher remain visible immediately, with an announced result count and a no-results message when appropriate. **Clear filters** restores the complete listing.
+
+The homepage loads its catalog and options at build time. A small Astro script filters the prerendered cards without a backend request, UI framework, or URL persistence; the SQL helper is for build-time consumers. Without JavaScript, controls remain disabled and the full catalog and game links remain available.
 
 ## Running tests
 

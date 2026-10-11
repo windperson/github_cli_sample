@@ -18,6 +18,7 @@ The app's data lives in a local SQLite database accessed through **Drizzle ORM**
 - `src/lib/db.ts` — `createDatabase(url)` / `getDatabase()` build the Drizzle client from `DATABASE_URL` (defaults to the local `tailspin.db` file).
 - `src/lib/games.ts` — typed, **injectable-db** data-access helpers used by pages and tests.
 - `src/lib/publishers.ts` — `getAllPublishers(db)` returns publisher ids and names, ordered by name.
+- `src/lib/categories.ts` — `getAllCategories(db)` returns category ids and names, ordered by name, including categories without games.
 
 ## Schema Conventions
 
@@ -55,6 +56,7 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 - Always `order by` a stable column (title) so static builds are deterministic.
 - Map raw rows to the app-facing `Game`/`Publisher`/`Category` types in one place; don't leak Drizzle row shapes into components.
 - Keep ordering/lookup logic in the relevant `src/lib/` helper module, not in pages.
+- `getAllGames(db, filters?)` accepts optional `categoryIds` (match any selected ID) and `publisherId`, combined with AND. Empty category arrays and omitted filters preserve unrestricted listings; unknown IDs do not fall back to all games. The static homepage filters prerendered cards in a scoped browser script with the same semantics; database helpers remain build-time only.
 
 ## Determinism
 

@@ -43,6 +43,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 - Define tables in `db/schema.ts`; manage schema changes with drizzle-kit migrations - see `drizzle.instructions.md`
 - Keep data-access helpers in `src/lib/` with an **injectable `db`** argument so they're testable
+- `getAllGames(db, filters?)` supports category IDs (OR) and a publisher ID (AND); empty categories leave that dimension unrestricted. Homepage filtering uses a scoped script over prerendered cards, not runtime database access, and retains the full catalog without JavaScript.
 - Keep CSV/seed logic as pure functions in `db/transforms.ts`
 - Seed-derived values must be deterministic (no `Math.random`) so static builds are reproducible
 
@@ -92,7 +93,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 The application lives at the repository root:
 
 - `db/`: Drizzle schema, migrations, transforms, seed, and `games.csv`
-- `src/lib/`: Node SQLite client (`db.ts`) and injectable data-access helpers (`games.ts`, `publishers.ts`)
+- `src/lib/`: Node SQLite client (`db.ts`) and injectable data-access helpers (`games.ts`, `publishers.ts`, `categories.ts`)
 - `src/components/`: reusable `.astro` components
 - `src/layouts/`: Astro layout templates
 - `src/pages/`: Astro page routes (`index.astro` listing, `game/[id].astro`, `404.astro`, `about.astro`)
